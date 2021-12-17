@@ -17,7 +17,7 @@ app.use(express.static("public"));
 
 // Routes
 app.get("/", (req, res) => {
-  res.render("lists");
+  res.render("lists", { todoLists });
 });
 
 // Listener
