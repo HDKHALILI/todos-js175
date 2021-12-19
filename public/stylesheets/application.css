@@ -29,6 +29,7 @@ body > header .actions {
 }
 
 body > header .actions a {
+  transition: color 200ms ease;
   -moz-transition: color 200ms ease;
   -o-transition: color 200ms ease;
   -webkit-transition: color 200ms ease;
@@ -37,6 +38,7 @@ body > header .actions a {
 form fieldset.actions a {
   color: #666666;
 
+  transition: color 200ms ease;
   -moz-transition: color 200ms ease;
   -o-transition: color 200ms ease;
   -webkit-transition: color 200ms ease;
@@ -53,6 +55,7 @@ body > header .actions a.add::before {
   height: 28px;
   margin: 0 7px 0 0;
 
+  transition: transform 200ms linear;
   -moz-transition: transform 200ms linear;
   -o-transition: transform 200ms linear;
   -webkit-transition: transform 200ms linear;
@@ -63,7 +66,7 @@ body > header .actions a.add::before {
 
 body > header .actions a.add:hover::before {
   filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=1);
-
+  transform: rotate(90deg);
   -moz-transform: rotate(90deg);
   -webkit-transform: rotate(90deg);
 }
@@ -122,6 +125,7 @@ form fieldset button {
   margin: 0 40px 0 0;
   padding: 12px 45px;
 
+  transition: background-color 200ms ease;
   -moz-transition: background-color 200ms ease;
   -o-transition: background-color 200ms ease;
   -webkit-transition: background-color 200ms ease;
@@ -226,6 +230,7 @@ form fieldset.actions a:hover {
   font: normal 20px "PT Sans", Helvetica, Arial, sans-serif;
   padding: 0;
 
+  transition: color 200ms ease;
   -moz-transition: color 200ms ease;
   -o-transition: color 200ms ease;
   -webkit-transition: color 200ms ease;
@@ -389,6 +394,7 @@ form fieldset.actions a:hover {
 }
 
 #todos header ul a.edit {
+  transition: background-color 200ms ease;
   -moz-transition: background-color 200ms ease;
   -o-transition: background-color 200ms ease;
   -webkit-transition: background-color 200ms ease;
