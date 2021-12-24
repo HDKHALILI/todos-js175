@@ -16,6 +16,7 @@ app.set("view engine", "pug");
 // Middleware to use
 app.use(morgan("common"));
 app.use(express.static("public"));
+// Tell express what format is used by form data
 app.use(express.urlencoded({ extended: false }));
 
 const compareByTitle = (todoA, todoB) => {
@@ -43,6 +44,7 @@ const sortTodoLists = lists => {
 };
 
 // Routes
+// Redirect start page
 app.get("/", (req, res) => {
   res.redirect("/lists");
 });
@@ -51,6 +53,7 @@ app.get("/lists", (req, res) => {
   res.render("lists", { todoLists: sortTodoLists(todoLists) });
 });
 
+// Render new todo list page
 app.get("/lists/new", (req, res) => {
   res.render("new-list");
 });
@@ -58,8 +61,24 @@ app.get("/lists/new", (req, res) => {
 // Create a new todo list
 app.post("/lists", (req, res) => {
   const title = req.body.todoListTitle.trim();
-  todoLists.push(new TodoList(title));
-  res.redirect("/lists");
+  if (title.length === 0) {
+    res.render("new-list", {
+      errorMessage: "A title was not provided.",
+    });
+  } else if (title.length > 100) {
+    res.render("new-list", {
+      errorMessage: "List title must be between 1 and 100 characters.",
+      todoListTitle: title,
+    });
+  } else if (todoLists.some(list => list.title === title)) {
+    res.render("new-list", {
+      errorMessage: "List title must be unique.",
+      todoListTitle: title,
+    });
+  } else {
+    todoLists.push(new TodoList(title));
+    res.redirect("/lists");
+  }
 });
 
 // Listener
