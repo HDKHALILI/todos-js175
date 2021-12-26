@@ -1,5 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
+const flash = require("express-flash");
+const session = require("express-session");
 
 const TodoList = require("./lib/todolist");
 
@@ -18,6 +20,20 @@ app.use(morgan("common"));
 app.use(express.static("public"));
 // Tell express what format is used by form data
 app.use(express.urlencoded({ extended: false }));
+app.use(
+  session({
+    name: "launch-school-todos-session-id",
+    resave: false,
+    saveUninitialized: true,
+    secret: "this is not very secure",
+  })
+);
+app.use(flash());
+app.use((req, res, next) => {
+  res.locals.flash = req.session.flash;
+
+  next();
+});
 
 const compareByTitle = (todoA, todoB) => {
   let titleA = todoA.title.toLowerCase();
@@ -50,7 +66,9 @@ app.get("/", (req, res) => {
 });
 
 app.get("/lists", (req, res) => {
-  res.render("lists", { todoLists: sortTodoLists(todoLists) });
+  res.render("lists", {
+    todoLists: sortTodoLists(todoLists),
+  });
 });
 
 // Render new todo list page
@@ -62,21 +80,24 @@ app.get("/lists/new", (req, res) => {
 app.post("/lists", (req, res) => {
   const title = req.body.todoListTitle.trim();
   if (title.length === 0) {
+    req.flash("error", "A title was not provided.");
     res.render("new-list", {
-      errorMessage: "A title was not provided.",
+      flash: req.flash(),
     });
   } else if (title.length > 100) {
+    req.flash("error", "List title must be between 1 and 100 characters.");
+    req.flash("error", "here is another error.");
     res.render("new-list", {
-      errorMessage: "List title must be between 1 and 100 characters.",
       todoListTitle: title,
     });
   } else if (todoLists.some(list => list.title === title)) {
+    req.flash("error", "List title must be unique.");
     res.render("new-list", {
-      errorMessage: "List title must be unique.",
       todoListTitle: title,
     });
   } else {
     todoLists.push(new TodoList(title));
+    req.flash("success", "The todo list has been created.");
     res.redirect("/lists");
   }
 });
