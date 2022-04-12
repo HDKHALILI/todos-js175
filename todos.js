@@ -5,6 +5,7 @@ const session = require("express-session");
 const { body, validationResult } = require("express-validator");
 
 const TodoList = require("./lib/todolist");
+const { sortTodoLists, sortTodos } = require("./lib/sort");
 
 const app = express();
 const host = "localhost";
@@ -36,28 +37,8 @@ app.use((req, res, next) => {
   next();
 });
 
-const compareByTitle = (todoA, todoB) => {
-  let titleA = todoA.title.toLowerCase();
-  let titleB = todoB.title.toLowerCase();
-
-  if (titleA < titleB) {
-    return -1;
-  } else if (titleA > titleB) {
-    return 1;
-  } else {
-    return 0;
-  }
-};
-
-// return the list of todo lists sorted by completion status and title
-const sortTodoLists = lists => {
-  const undone = lists.filter(todoList => !todoList.isDone());
-  const done = lists.filter(todoList => todoList.isDone());
-
-  undone.sort(compareByTitle);
-  done.sort(compareByTitle);
-
-  return [...undone, ...done];
+const loadTodoList = todoListId => {
+  return todoLists.find(todoList => todoList.id === Number(todoListId));
 };
 
 // Routes
@@ -75,6 +56,20 @@ app.get("/lists", (req, res) => {
 // Render new todo list page
 app.get("/lists/new", (req, res) => {
   res.render("new-list");
+});
+
+// Render an individual todo list and its todos
+app.get("/lists/:todoListId", (req, res, next) => {
+  const { todoListId } = req.params;
+  const todoList = loadTodoList(todoListId);
+  if (todoList === undefined) {
+    next(new Error("Not Found."));
+  } else {
+    res.render("list", {
+      todoList: todoList,
+      todos: sortTodos(todoList),
+    });
+  }
 });
 
 // Create a new todo list
@@ -95,11 +90,12 @@ app.post(
   ],
   (req, res) => {
     const errors = validationResult(req);
+    const title = req.body.todoListTitle;
     if (!errors.isEmpty()) {
       errors.array().forEach(message => req.flash("error", message.msg));
       res.render("new-list", {
         flash: req.flash(),
-        todoListTitle: req.body.todoListTitle,
+        todoListTitle: title,
       });
     } else {
       todoLists.push(new TodoList(title));
@@ -108,6 +104,12 @@ app.post(
     }
   }
 );
+
+// Error handler
+app.use((err, req, res, _next) => {
+  console.log(err);
+  res.status(404).send(err.message);
+});
 
 // Listener
 app.listen(port, host, () => {
