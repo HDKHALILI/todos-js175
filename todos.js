@@ -197,6 +197,7 @@ app.post(
         });
       } else {
         todoList.add(new Todo(title));
+        req.flash("success", `"${title}" is added to the list.`);
         res.redirect(`/lists/${todoListId}`);
       }
     }
