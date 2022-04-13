@@ -132,6 +132,22 @@ app.post("/lists/:todoListId/todos/:todoId/toggle", (req, res, next) => {
   }
 });
 
+// Delete a todo
+app.post("/lists/:todoListId/todos/:todoId/destroy", (req, res, next) => {
+  const { todoListId, todoId } = req.params;
+  const todo = loadATodo(todoListId, todoId);
+
+  if (!todo) {
+    next(new Error("Not Found"));
+  } else {
+    const todoList = loadTodoList(todoListId);
+    const index = todoList.findIndexOf(todo);
+    todoList.removeAt(index);
+
+    res.redirect(`/lists/${todoListId}`);
+  }
+});
+
 // Error handler
 app.use((err, req, res, _next) => {
   console.log(err);
