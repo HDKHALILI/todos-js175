@@ -7,7 +7,7 @@ block main
       ul
         if todoList.size() > 0 && !todoList.isDone()
           li 
-            form.complete_all(action=`lists/${todoList.id}/complete_all`
+            form.complete_all(action=`/lists/${todoList.id}/complete_all`
                               method="post")
               button.check(type="submit") Complete All
           li 
@@ -17,14 +17,14 @@ block main
     ul 
       each todo in todos 
         li(class=todo.isDone() ? "done" : "")
-          form.check(action=`lists/${todoList.id}/todos/${todo.id}/toggle` method="post")
+          form.check(action=`/lists/${todoList.id}/todos/${todo.id}/toggle` method="post")
             input(type="hidden" name="done" value=!todo.isDone())
             button Done 
           h3= todo.title 
-          form.delete(action=`lists/${todoList.id}/todos/${todo.id}/destroy` method="post")
+          form.delete(action=`/lists/${todoList.id}/todos/${todo.id}/destroy` method="post")
             button Delete
 
-    form(action=`lists/${todoList.id}/todos` method="post")
+    form(action=`/lists/${todoList.id}/todos` method="post")
       dl 
         dt 
           label(for="todoTitle") Enter a new todo item:
