@@ -142,7 +142,9 @@ app.post("/lists/:todoListId/todos/:todoId/destroy", (req, res, next) => {
   } else {
     const todoList = loadTodoList(todoListId);
     const index = todoList.findIndexOf(todo);
+    const title = todo.title;
     todoList.removeAt(index);
+    req.flash("success", `The "${title}" todo has been deleted.`);
 
     res.redirect(`/lists/${todoListId}`);
   }
