@@ -41,6 +41,14 @@ const loadTodoList = todoListId => {
   return todoLists.find(todoList => todoList.id === Number(todoListId));
 };
 
+const loadATodo = (todoListId, todoId) => {
+  const todoList = loadTodoList(Number(todoListId));
+  if (!todoList) return undefined;
+
+  // find method returns 'undefined' if no item found
+  return todoList.todos.find(todo => todo.id === Number(todoId));
+};
+
 // Routes
 // Redirect start page
 app.get("/", (req, res) => {
@@ -104,6 +112,25 @@ app.post(
     }
   }
 );
+
+// toggle todo's done property
+app.post("/lists/:todoListId/todos/:todoId/toggle", (req, res, next) => {
+  const { todoListId, todoId } = req.params;
+  const todo = loadATodo(todoListId, todoId);
+  if (!todo) {
+    next(new Error("Not Found"));
+  } else {
+    const title = todo.title;
+    if (todo.isDone()) {
+      todo.markUndone();
+      req.flash(`Success ${title} marked as NOT done!`);
+    } else {
+      todo.markDone();
+      req.flash(`success ${title} marked done!`);
+    }
+    res.redirect(`/lists/${todoListId}`);
+  }
+});
 
 // Error handler
 app.use((err, req, res, _next) => {
