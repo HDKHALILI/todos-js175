@@ -217,6 +217,21 @@ app.get("/lists/:todoListId/edit", (req, res, next) => {
   }
 });
 
+app.post("/lists/:todoListId/destroy", (req, res, next) => {
+  const { todoListId } = req.params;
+  const index = todoLists.findIndex(
+    todoList => todoList.id === Number(todoListId)
+  );
+
+  if (index === -1) {
+    next(new Error("Not Found"));
+  } else {
+    todoLists.splice(index, 1);
+
+    res.redirect("/lists");
+  }
+});
+
 // Error handler
 app.use((err, req, res, _next) => {
   console.log(err);
