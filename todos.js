@@ -217,6 +217,7 @@ app.get("/lists/:todoListId/edit", (req, res, next) => {
   }
 });
 
+// Delete a list
 app.post("/lists/:todoListId/destroy", (req, res, next) => {
   const { todoListId } = req.params;
   const index = todoLists.findIndex(
@@ -232,6 +233,47 @@ app.post("/lists/:todoListId/destroy", (req, res, next) => {
     res.redirect("/lists");
   }
 });
+
+// Update list title
+app.post(
+  "/lists/:todoListId",
+  [
+    body("todoListTitle")
+      .trim()
+      .isLength({ min: 1 })
+      .withMessage("The list title is required")
+      .isLength({ max: 100 })
+      .withMessage("List title must be between 1 and 100 characters.")
+      .custom(title => {
+        const duplicate = todoLists.find(list => list.title === title);
+        return duplicate === undefined;
+      })
+      .withMessage("List title must be unique."),
+  ],
+  (req, res, next) => {
+    const { todoListId } = req.params;
+    const todoList = loadTodoList(todoListId);
+
+    if (!todoList) {
+      next(new Error("Not Found"));
+    } else {
+      const errors = validationResult(req);
+      const title = req.body.todoListTitle;
+      if (!errors.isEmpty()) {
+        errors.array().forEach(message => req.flash("error", message.msg));
+
+        res.render("edit-list", {
+          flash: req.flash(),
+          todoListTitle: title,
+          todoList: todoList,
+        });
+      } else {
+        todoList.setTitle(title);
+        res.redirect(`/lists/${todoListId}`);
+      }
+    }
+  }
+);
 
 // Error handler
 app.use((err, req, res, _next) => {
