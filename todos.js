@@ -269,6 +269,7 @@ app.post(
         });
       } else {
         todoList.setTitle(title);
+        req.flash("success", "Todo list updated");
         res.redirect(`/lists/${todoListId}`);
       }
     }
