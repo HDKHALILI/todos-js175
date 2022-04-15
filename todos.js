@@ -226,8 +226,9 @@ app.post("/lists/:todoListId/destroy", (req, res, next) => {
   if (index === -1) {
     next(new Error("Not Found"));
   } else {
+    const title = todoLists[index].title;
     todoLists.splice(index, 1);
-
+    req.flash("success", `The "${title}" list deleted.`);
     res.redirect("/lists");
   }
 });
