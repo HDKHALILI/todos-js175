@@ -11,7 +11,7 @@ block main
                               method="post")
               button.check(type="submit") Complete All
           li 
-            form(action=`lists/${todoList.id}/edit` method="get")
+            form(action=`/lists/${todoList.id}/edit` method="get")
               button.edit(type="submit") Edit List
 
     ul 
