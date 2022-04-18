@@ -22,32 +22,7 @@ app.use(morgan("common"));
 app.use(express.static("public"));
 // Tell express what format is used by form data
 app.use(express.urlencoded({ extended: false }));
-app.use(
-  session({
-    name: "launch-school-todos-session-id",
-    resave: false,
-    saveUninitialized: true,
-    secret: "this is not very secure",
-  })
-);
-app.use(flash());
-app.use((req, res, next) => {
-  res.locals.flash = req.session.flash;
 
-  next();
-});
-// Set up persistent session data
-app.use((req, res, next) => {
-  const todoLists = [];
-  if ("todoLists" in req.session) {
-    req.session.todoLists.forEach(todoList => {
-      todoLists.push(TodoList.makeTodoList(todoList));
-    });
-  }
-
-  req.session.todoLists = todoLists;
-  next();
-});
 app.use(
   session({
     cookie: {
@@ -63,6 +38,26 @@ app.use(
     store: new LokiStore({}),
   })
 );
+app.use(flash());
+// Set up persistent session data
+app.use((req, res, next) => {
+  const todoLists = [];
+  if ("todoLists" in req.session) {
+    req.session.todoLists.forEach(todoList => {
+      todoLists.push(TodoList.makeTodoList(todoList));
+    });
+  }
+
+  req.session.todoLists = todoLists;
+  next();
+});
+
+// extract session info
+app.use((req, res, next) => {
+  res.locals.flash = req.session.flash;
+  delete req.session.flash;
+  next();
+});
 
 const loadTodoList = (todoListId, todoLists) => {
   return todoLists.find(todoList => todoList.id === Number(todoListId));
