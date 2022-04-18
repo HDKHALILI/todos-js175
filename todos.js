@@ -3,6 +3,7 @@ const morgan = require("morgan");
 const flash = require("express-flash");
 const session = require("express-session");
 const { body, validationResult } = require("express-validator");
+const store = require("connect-loki");
 
 const Todo = require("./lib/todo");
 const TodoList = require("./lib/todolist");
@@ -11,6 +12,7 @@ const { sortTodoLists, sortTodos } = require("./lib/sort");
 const app = express();
 const host = "localhost";
 const port = 3003;
+const LokiStore = store(session);
 
 // Static data for initial testing
 let todoLists = require("./lib/seed-data");
@@ -37,6 +39,29 @@ app.use((req, res, next) => {
 
   next();
 });
+// Set up persistent session data
+app.use((req, res, next) => {
+  if (!("todoLists" in req.session)) {
+    req.session.todoLists = [];
+  }
+
+  next();
+});
+app.use(
+  session({
+    cookie: {
+      httpOnly: true,
+      maxAge: 31 * 24 * 60 * 60 * 1000, // 31 days in milliseconds
+      path: "/",
+      secure: false,
+    },
+    name: "launch-school-todos-session-id",
+    resave: false,
+    saveUninitialized: true,
+    secret: "this is not very secure",
+    store: new LokiStore({}),
+  })
+);
 
 const loadTodoList = todoListId => {
   return todoLists.find(todoList => todoList.id === Number(todoListId));
