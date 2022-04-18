@@ -267,7 +267,7 @@ app.post(
       .withMessage("The list title is required")
       .isLength({ max: 100 })
       .withMessage("List title must be between 1 and 100 characters.")
-      .custom(title => {
+      .custom((title, { req }) => {
         const duplicate = req.session.todoLists.find(
           list => list.title === title
         );
